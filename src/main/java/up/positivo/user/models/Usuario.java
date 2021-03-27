@@ -7,7 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
 
 @Entity
 public class Usuario {
@@ -15,6 +19,7 @@ public class Usuario {
 	@Id
 	@Column(nullable = false, length = 11)
 	@NotNull(message = "Preenchimento Obrigatório")
+	@Length(min = 11, max = 11, message = "Número inválido")
 	private String cpf;
 
 	@Column(nullable = false, length = 200)
@@ -41,6 +46,8 @@ public class Usuario {
 	// 2 = recepção
 	// 3 = gerente
 	@Column(nullable = false)
+	@Min(value = 1, message = "Nível incorreto")
+	@Max(value = 3, message = "Nível incorreto")
 	private int nivel = 1;
 
 	public String getCpf() {
