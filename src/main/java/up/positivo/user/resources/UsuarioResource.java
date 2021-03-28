@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +27,7 @@ public class UsuarioResource extends CustomErrors {
 
 	@PostMapping("/")
 	@ApiOperation(value = "Cadastrar Usuário")
-	public ResponseEntity<Usuario> create(@Validated(UsuarioValidation.CreateOrUpdate.class) @RequestBody UsuarioValidation usuarioValidation) {
+	public ResponseEntity<Usuario> create(@RequestBody UsuarioValidation usuarioValidation) {
 		try {
 
 			int nvLogado = usuarioValidation.getNivelLogado();
@@ -69,7 +68,7 @@ public class UsuarioResource extends CustomErrors {
 	
 	@PostMapping("/atualizar")
 	@ApiOperation(value = "Atualizar Usuário")
-	public ResponseEntity<Usuario> update(@Validated(UsuarioValidation.CreateOrUpdate.class) @RequestBody UsuarioValidation usuarioValidation) {
+	public ResponseEntity<Usuario> update(@RequestBody UsuarioValidation usuarioValidation) {
 		try {
 
 			int nvLogado = usuarioValidation.getNivelLogado();

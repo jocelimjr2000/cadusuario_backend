@@ -2,38 +2,28 @@ package up.positivo.user.validations;
 
 import java.util.Date;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+@Valid
 public class UsuarioValidation {
 	
-	
-	public interface CreateOrUpdate {
-
-	}
-
-	public interface Login {
-
-	}
-	
-	@NotNull(message = "Preenchimento Obrigatório", groups = { CreateOrUpdate.class })
+	@NotNull(message = "Preenchimento Obrigatório")
 	private String cpf;
 
-	@NotNull(message = "Preenchimento Obrigatório", groups = { CreateOrUpdate.class })
+	@NotNull(message = "Preenchimento Obrigatório")
 	private String nome;
 
-	@NotNull(message = "Preenchimento Obrigatório", groups = { CreateOrUpdate.class, Login.class })
+	@NotNull(message = "Preenchimento Obrigatório")
 	private String email;
 	
-	@NotNull(message = "Preenchimento Obrigatório", groups = { Login.class })
-	private String senha;
-
-	@NotNull(message = "Preenchimento Obrigatório", groups = { CreateOrUpdate.class })
+	@NotNull(message = "Preenchimento Obrigatório")
 	private Date dtNascimento;
 	
-	@Min(value = 1, message = "Nível incorreto", groups = { CreateOrUpdate.class })
-	@Max(value = 3, message = "Nível incorreto", groups = { CreateOrUpdate.class })
+	@Min(value = 1, message = "Nível incorreto")
+	@Max(value = 3, message = "Nível incorreto")
 	private int nivel = 1;
 	
 	public String getCpf() {
@@ -58,14 +48,6 @@ public class UsuarioValidation {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
 	}
 
 	public Date getDtNascimento() {
