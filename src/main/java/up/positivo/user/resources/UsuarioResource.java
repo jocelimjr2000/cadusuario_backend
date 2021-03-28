@@ -2,8 +2,6 @@ package up.positivo.user.resources;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +16,9 @@ import io.swagger.annotations.ApiOperation;
 import up.positivo.user.CustomErrors;
 import up.positivo.user.models.Usuario;
 import up.positivo.user.repositories.UsuarioRepository;
+import up.positivo.user.validations.UsuarioValidation;
+
+// Login (retornando token) / Validar token
 
 @RestController
 @RequestMapping(value = "/usuario")
@@ -26,12 +27,39 @@ public class UsuarioResource extends CustomErrors {
 	@Autowired
 	UsuarioRepository usuarioRepository;
 
-	@GetMapping("/")
-	@ApiOperation(value = "Listar todos os usuários")
-	public ResponseEntity<List<Usuario>> list() {
+	@PostMapping("/")
+	@ApiOperation(value = "Cadastrar Usuário")
+	public ResponseEntity<Usuario> create(@RequestBody UsuarioValidation usuarioValidation) {
 		try {
 
-			List<Usuario> usuario = usuarioRepository.findAll();
+			int nvLogado = usuarioValidation.getNivelLogado();
+			int nvCad = usuarioValidation.getNivel();
+			String cpf = usuarioValidation.getCpf();
+
+			if (nvLogado == (int) 1) {
+				return this.singleErrorException("error", "usuários do nível 1 não podem cadastrar outros usuários");
+			}
+
+			if (nvLogado == 2 && nvCad > 1) {
+				return this.singleErrorException("error", "usuários do nível 2 só podem cadastrar usuários do nível 1");
+			}
+
+			Usuario verificarUsuario = usuarioRepository.findByCpf(cpf);
+
+			if (verificarUsuario != null) {
+				return this.singleErrorException("error", "CPF já cadastrado");
+			}
+
+			Usuario usuario = new Usuario();
+
+			usuario.setCpf(cpf);
+			usuario.setNome(usuarioValidation.getNome());
+			usuario.setEmail(usuarioValidation.getEmail());
+			usuario.setSenha(usuarioValidation.getCpf());
+			usuario.setDtNascimento(usuarioValidation.getDtNascimento());
+			usuario.setNivel(nvCad);
+
+			usuario = usuarioRepository.save(usuario);
 
 			return new ResponseEntity<>(usuario, HttpStatus.CREATED);
 
@@ -40,12 +68,35 @@ public class UsuarioResource extends CustomErrors {
 		}
 	}
 	
-	@GetMapping("/pendente")
-	@ApiOperation(value = "Listar todos os usuários pendentes de ativação")
-	public ResponseEntity<List<Usuario>> list2() {
+	@PostMapping("/atualizar")
+	@ApiOperation(value = "Atualizar Usuário")
+	public ResponseEntity<Usuario> update(@RequestBody UsuarioValidation usuarioValidation) {
 		try {
 
-			List<Usuario> usuario = usuarioRepository.findByAprovadoFalse();
+			int nvLogado = usuarioValidation.getNivelLogado();
+			int nvCad = usuarioValidation.getNivel();
+			String cpf = usuarioValidation.getCpf();
+
+			if (nvLogado == (int) 1) {
+				return this.singleErrorException("error", "usuários do nível 1 não podem cadastrar outros usuários");
+			}
+
+			if (nvLogado == 2 && nvCad > 1) {
+				return this.singleErrorException("error", "usuários do nível 2 só podem cadastrar usuários do nível 1");
+			}
+
+			Usuario usuario = usuarioRepository.findByCpf(cpf);
+
+			if (usuario == null) {
+				return this.singleErrorException("error", "CPF não cadastrado");
+			}
+
+			usuario.setNome(usuarioValidation.getNome());
+			usuario.setEmail(usuarioValidation.getEmail());
+			usuario.setDtNascimento(usuarioValidation.getDtNascimento());
+			usuario.setNivel(nvCad);
+
+			usuario = usuarioRepository.save(usuario);
 
 			return new ResponseEntity<>(usuario, HttpStatus.CREATED);
 
@@ -54,6 +105,24 @@ public class UsuarioResource extends CustomErrors {
 		}
 	}
 	
+	@GetMapping("/listar/{status}")
+	@ApiOperation(value = "Listar todos os usuários por status")
+	public ResponseEntity<List<Usuario>> listStatus(@PathVariable("status") String status) {
+		try {
+
+			status = status.toUpperCase();
+
+			if (status.equals("A") || status.equals("P") || status.equals("R")) {
+				return new ResponseEntity<>(usuarioRepository.findByAprovado(status), HttpStatus.CREATED);
+			}
+
+			return this.singleErrorException("error", "status inválido");
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GetMapping("/{cpf}")
 	@ApiOperation(value = "Pesquisar usuário por CPF")
 	public ResponseEntity<Usuario> findOne(@PathVariable("cpf") String cpf) {
@@ -67,52 +136,38 @@ public class UsuarioResource extends CustomErrors {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	@PostMapping("/")
-	@ApiOperation(value = "Cadastrar Usuário")
-	public ResponseEntity<Usuario> create(@Valid @RequestBody Usuario usuario) {
-		try {
-			
-			Usuario verificarUsuario = usuarioRepository.findByCpf(usuario.getCpf());
-			
-			if(verificarUsuario == null) {
-				int nivel = usuario.getNivel();
-				
-				if(nivel != 1) {
-					
-					// Regras de aprovação
-					
-					
-				}
-				
-				return new ResponseEntity<>(usuarioRepository.save(usuario), HttpStatus.CREATED);
 
-			}
-			
-			return new ResponseEntity<>(null, HttpStatus.FOUND);
+	@GetMapping("/aprovar/{cpf}")
+	@ApiOperation(value = "Reprovar usuário")
+	public ResponseEntity<Usuario> aprovar(@PathVariable("cpf") String cpf) {
+		try {
+
+			return new ResponseEntity<>(this.alterStatus(cpf, "A"), HttpStatus.CREATED);
 
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	@PostMapping("/{cpf}")
-	@ApiOperation(value = "Atualizar Usuário")
-	public ResponseEntity<Usuario> update(@Valid @RequestBody Usuario usuario) {
-		try {
-			
-			Usuario verificarUsuario = usuarioRepository.findByCpf(usuario.getCpf());
-			
-			if(verificarUsuario != null) {
-				
-				return new ResponseEntity<>(usuarioRepository.save(usuario), HttpStatus.CREATED);
 
-			}
-			
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+	@GetMapping("/reprovar/{cpf}")
+	@ApiOperation(value = "Reprovar usuário")
+	public ResponseEntity<Usuario> reprovar(@PathVariable("cpf") String cpf) {
+		try {
+
+			return new ResponseEntity<>(this.alterStatus(cpf, "R"), HttpStatus.CREATED);
 
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	private Usuario alterStatus(String cpf, String status) {
+		Usuario usuario = usuarioRepository.findByCpf(cpf);
+
+		usuario.setAprovado(status);
+
+		usuarioRepository.save(usuario);
+
+		return usuario;
 	}
 }

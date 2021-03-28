@@ -10,6 +10,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	
 	Usuario findByCpf(String cpf);
 	
-	List<Usuario> findByAprovadoFalse();
+	List<Usuario> findByAprovado(String aprovado);
 	
 }
