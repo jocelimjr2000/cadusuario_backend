@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +19,6 @@ import up.positivo.user.models.Usuario;
 import up.positivo.user.repositories.UsuarioRepository;
 import up.positivo.user.validations.UsuarioValidation;
 
-// Login (retornando token) / Validar token
-
 @RestController
 @RequestMapping(value = "/usuario")
 public class UsuarioResource extends CustomErrors {
@@ -29,7 +28,7 @@ public class UsuarioResource extends CustomErrors {
 
 	@PostMapping("/")
 	@ApiOperation(value = "Cadastrar Usuário")
-	public ResponseEntity<Usuario> create(@RequestBody UsuarioValidation usuarioValidation) {
+	public ResponseEntity<Usuario> create(@Validated(UsuarioValidation.CreateOrUpdate.class) @RequestBody UsuarioValidation usuarioValidation) {
 		try {
 
 			int nvLogado = usuarioValidation.getNivelLogado();
@@ -70,7 +69,7 @@ public class UsuarioResource extends CustomErrors {
 	
 	@PostMapping("/atualizar")
 	@ApiOperation(value = "Atualizar Usuário")
-	public ResponseEntity<Usuario> update(@RequestBody UsuarioValidation usuarioValidation) {
+	public ResponseEntity<Usuario> update(@Validated(UsuarioValidation.CreateOrUpdate.class) @RequestBody UsuarioValidation usuarioValidation) {
 		try {
 
 			int nvLogado = usuarioValidation.getNivelLogado();
@@ -113,7 +112,7 @@ public class UsuarioResource extends CustomErrors {
 			status = status.toUpperCase();
 
 			if (status.equals("A") || status.equals("P") || status.equals("R")) {
-				return new ResponseEntity<>(usuarioRepository.findByAprovado(status), HttpStatus.CREATED);
+				return new ResponseEntity<>(usuarioRepository.findByAprovadoOrderByNomeAsc(status), HttpStatus.CREATED);
 			}
 
 			return this.singleErrorException("error", "status inválido");
@@ -160,7 +159,7 @@ public class UsuarioResource extends CustomErrors {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
+	
 	private Usuario alterStatus(String cpf, String status) {
 		Usuario usuario = usuarioRepository.findByCpf(cpf);
 

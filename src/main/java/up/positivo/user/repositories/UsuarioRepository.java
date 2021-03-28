@@ -10,6 +10,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	
 	Usuario findByCpf(String cpf);
 	
-	List<Usuario> findByAprovado(String aprovado);
+	Usuario findByEmailAndSenha(String email, String senha);
+	
+	List<Usuario> findByAprovadoOrderByNomeAsc(String aprovado);
 	
 }
