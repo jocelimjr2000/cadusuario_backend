@@ -138,7 +138,7 @@ public class UsuarioResource extends CustomErrors {
 	}
 
 	@GetMapping("/aprovar/{cpf}")
-	@ApiOperation(value = "Reprovar usuário")
+	@ApiOperation(value = "Aprovar usuário")
 	public ResponseEntity<Usuario> aprovar(@PathVariable("cpf") String cpf) {
 		try {
 
