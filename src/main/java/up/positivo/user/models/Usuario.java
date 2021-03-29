@@ -17,7 +17,6 @@ public class Usuario {
 
 	@Id
 	@Column(nullable = false, length = 11)
-	@Length(min = 11, max = 11, message = "Número inválido")
 	private String cpf;
 
 	@Column(nullable = false, length = 200)

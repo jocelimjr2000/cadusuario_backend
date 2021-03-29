@@ -1,9 +1,9 @@
 package up.positivo.user.validations;
 
-import javax.validation.Valid;
+
 import javax.validation.constraints.NotNull;
 
-@Valid
+
 public class LoginValidation {
 
 	@NotNull(message = "Preenchimento Obrigatório")

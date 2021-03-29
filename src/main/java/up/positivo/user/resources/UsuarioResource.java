@@ -2,6 +2,8 @@ package up.positivo.user.resources;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ public class UsuarioResource extends CustomErrors {
 
 	@PostMapping("/")
 	@ApiOperation(value = "Cadastrar Usuário")
-	public ResponseEntity<Usuario> create(@RequestBody UsuarioValidation usuarioValidation) {
+	public ResponseEntity<Usuario> create(@Valid @RequestBody UsuarioValidation usuarioValidation) {
 		try {
 
 			int nvLogado = usuarioValidation.getNivelLogado();
@@ -68,7 +70,7 @@ public class UsuarioResource extends CustomErrors {
 	
 	@PostMapping("/atualizar")
 	@ApiOperation(value = "Atualizar Usuário")
-	public ResponseEntity<Usuario> update(@RequestBody UsuarioValidation usuarioValidation) {
+	public ResponseEntity<Usuario> update(@Valid @RequestBody UsuarioValidation usuarioValidation) {
 		try {
 
 			int nvLogado = usuarioValidation.getNivelLogado();

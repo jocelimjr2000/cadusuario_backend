@@ -2,15 +2,18 @@ package up.positivo.user.validations;
 
 import java.util.Date;
 
-import javax.validation.Valid;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-@Valid
+import org.hibernate.validator.constraints.Length;
+
+
 public class UsuarioValidation {
 	
 	@NotNull(message = "Preenchimento Obrigatório")
+	@Length(min = 11, max = 11, message = "Número inválido")
 	private String cpf;
 
 	@NotNull(message = "Preenchimento Obrigatório")

@@ -1,5 +1,7 @@
 package up.positivo.user.resources;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ public class LoginResource extends CustomErrors {
 
 	@PostMapping()
 	@ApiOperation(value = "Logar")
-	public ResponseEntity<Usuario> login(@RequestBody LoginValidation loginValidation) {
+	public ResponseEntity<Usuario> login(@Valid @RequestBody LoginValidation loginValidation) {
 		try {
 
 			String email = loginValidation.getEmail();
