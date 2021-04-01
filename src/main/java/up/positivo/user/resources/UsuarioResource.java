@@ -129,8 +129,12 @@ public class UsuarioResource extends CustomErrors {
 		try {
 
 			Usuario usuario = usuarioRepository.findByCpf(cpf);
-
-			return new ResponseEntity<>(usuario, HttpStatus.CREATED);
+			
+			if (usuario != null) {
+				return new ResponseEntity<>(usuario, HttpStatus.CREATED);
+			}
+			
+			return this.singleErrorException("error", "CPF não cadastrado");
 
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
