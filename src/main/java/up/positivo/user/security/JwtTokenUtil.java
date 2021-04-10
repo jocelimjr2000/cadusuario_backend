@@ -35,6 +35,7 @@ public class JwtTokenUtil implements Serializable {
 	 */
 	public String generateToken(Usuario usuario) {
 		Map<String, Object> claims = new HashMap<>();
+		claims.put("userData", usuario);
 		
 		return doGenerateToken(claims, usuario.getNome());
 	}
@@ -106,7 +107,29 @@ public class JwtTokenUtil implements Serializable {
 	private Date getExpirationDateFromToken(String token) {
 		return getClaimFromToken(token, Claims::getExpiration);
 	}
+	
+	/**
+	 * User data
+	 * 
+	 * @param token
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Usuario getUserData(String token) {
+		Object claims = getAllClaimsFromToken(token).get("userData");
 		
+		Map<String,?> map = (Map<String, ?>) claims;
+
+		Usuario usuario = new Usuario();
+		usuario.setCpf((String) map.get("cpf"));
+		usuario.setNome((String) map.get("nome"));
+		usuario.setEmail((String) map.get("email"));
+		usuario.setAprovado((String) map.get("aprovado"));
+		usuario.setNivel((int) map.get("nivel"));
+		
+		return usuario;
+	}
+	
 	/**
 	 * Get data
 	 * 
@@ -125,7 +148,11 @@ public class JwtTokenUtil implements Serializable {
 	 * @return
 	 */
 	private Claims getAllClaimsFromToken(String token) {
-		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+		return Jwts
+					.parser()
+					.setSigningKey(secret)
+					.parseClaimsJws(token)
+					.getBody();
 	}
 	
 }

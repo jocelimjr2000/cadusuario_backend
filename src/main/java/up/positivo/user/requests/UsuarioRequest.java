@@ -66,20 +66,4 @@ public class UsuarioRequest {
 	public void setNivel(int nivel) {
 		this.nivel = nivel;
 	}
-
-	/*
-	 * GAMBI
-	 */
-
-	@Min(value = 1, message = "Nível logado incorreto")
-	@Max(value = 3, message = "Nível logado incorreto")
-	private int nivelLogado;
-
-	public int getNivelLogado() {
-		return nivelLogado;
-	}
-
-	public void setNivelLogado(int nivelLogado) {
-		this.nivelLogado = nivelLogado;
-	}
 }

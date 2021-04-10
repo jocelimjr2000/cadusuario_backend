@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,13 +27,12 @@ public class UsuarioResource extends CustomErrors {
 
 	@Autowired
 	UsuarioRepository usuarioRepository;
-
+	
 	@PostMapping("/")
 	@ApiOperation(value = "Cadastrar Usuário")
-	public ResponseEntity<Usuario> create(@Valid @RequestBody UsuarioRequest usuarioValidation) {
+	public ResponseEntity<Usuario> create(@Valid @RequestBody UsuarioRequest usuarioValidation, @RequestAttribute("usuarioNivel") int nvLogado) {
 		try {
-
-			int nvLogado = usuarioValidation.getNivelLogado();
+			
 			int nvCad = usuarioValidation.getNivel();
 			String cpf = usuarioValidation.getCpf();
 
@@ -67,10 +67,10 @@ public class UsuarioResource extends CustomErrors {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
+	
 	@PostMapping("/atualizar")
 	@ApiOperation(value = "Atualizar Usuário")
-	public ResponseEntity<Usuario> update(@Valid @RequestBody UsuarioRequest usuarioValidation) {
+	public ResponseEntity<Usuario> update(@Valid @RequestBody UsuarioRequest usuarioValidation, @RequestAttribute("usuarioNivel") int nvLogado) {
 		try {
 
 			// Puxa o usuario do banco a partir do cpf validation
@@ -83,13 +83,6 @@ public class UsuarioResource extends CustomErrors {
 
 			// Pega nivel do usuario do banco
 			int nvCad = usuario.getNivel();
-
-			/*
-			 * 
-			 * NV LOGADO VIRA DO TOKEN
-			 * 
-			 */
-			int nvLogado = usuarioValidation.getNivelLogado();
 
 			if (nvLogado == (int) 1) {
 				return this.singleErrorException("error", "usuários do nível 1 não podem alterar outros usuários");
@@ -117,12 +110,12 @@ public class UsuarioResource extends CustomErrors {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
+	
 	@GetMapping("/listar/{status}")
 	@ApiOperation(value = "Listar todos os usuários por status")
 	public ResponseEntity<List<Usuario>> listStatus(@PathVariable("status") String status) {
 		try {
-
+			
 			status = status.toUpperCase();
 
 			if (status.equals("A") || status.equals("P") || status.equals("R")) {

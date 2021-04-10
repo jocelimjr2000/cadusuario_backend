@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import up.positivo.user.entities.Usuario;
 import up.positivo.user.security.JwtTokenUtil;
 
 @Component
@@ -64,7 +65,13 @@ public class Interceptor implements HandlerInterceptor {
 
 				return false;
 			}
-
+			
+			// Get token data
+			Usuario userData = jtwTokenUtil.getUserData(requestToken);
+			
+			request.setAttribute("usuarioNivel", userData.getNivel());
+			request.setAttribute("usuarioNome", userData.getNome());
+			
 			// Request is valid
 			response.addHeader(validationHeader, "Ok");
 			return true;
