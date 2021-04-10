@@ -1,10 +1,10 @@
-package up.positivo.user.validations;
+package up.positivo.user.requests;
 
 
 import javax.validation.constraints.NotNull;
 
 
-public class LoginValidation {
+public class LoginRequest {
 
 	@NotNull(message = "Preenchimento Obrigatório")
 	private String email;

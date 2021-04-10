@@ -1,7 +1,6 @@
-package up.positivo.user.validations;
+package up.positivo.user.requests;
 
 import java.util.Date;
-
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -9,9 +8,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
+public class UsuarioRequest {
 
-public class UsuarioValidation {
-	
 	@NotNull(message = "Preenchimento Obrigatório")
 	@Length(min = 11, max = 11, message = "Número inválido")
 	private String cpf;
@@ -21,14 +19,14 @@ public class UsuarioValidation {
 
 	@NotNull(message = "Preenchimento Obrigatório")
 	private String email;
-	
+
 	@NotNull(message = "Preenchimento Obrigatório")
 	private Date dtNascimento;
-	
+
 	@Min(value = 1, message = "Nível incorreto")
 	@Max(value = 3, message = "Nível incorreto")
 	private int nivel = 1;
-	
+
 	public String getCpf() {
 		return cpf;
 	}
@@ -68,18 +66,15 @@ public class UsuarioValidation {
 	public void setNivel(int nivel) {
 		this.nivel = nivel;
 	}
-	
-	
-	
-	
+
 	/*
 	 * GAMBI
 	 */
-	
+
 	@Min(value = 1, message = "Nível logado incorreto")
 	@Max(value = 3, message = "Nível logado incorreto")
 	private int nivelLogado;
-	
+
 	public int getNivelLogado() {
 		return nivelLogado;
 	}

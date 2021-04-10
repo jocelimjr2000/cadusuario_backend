@@ -14,7 +14,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -22,3 +22,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+      
+apikey: 3909737d-a9b7-4d26-8123-0ddf6b7df908
+
+jwt:
+  secret: -----BEGIN RSA PRIVATE KEY----- MIICWwIBAAKBgQCP2Jsuai5mnvrPevaPyfgt9Qn2+YXPBusAj0wJtu1MJJnJ2k+OyxkQWEgfHJ3UyhdCWpuE5awZA1PJoMQxSF5w38MQb7WvUvqY+8O3kblp0aEWKgln8V7CxKeg8RtJrX6PtQVKP3iNzZW0c/pdLZhZpGUt8sACequ33l6nNWRKBQIDAQABAoGAZpGyXY9TFNOpzgZFB9ShRcvjVhsoga3SJi0HsCmi3Vd/3YHwlsZVUeVRT/XsyQ1tNmA7YrEOXSuVNEGRg/6xb7ymJb+i0RUp6AQLudiqQZRQ83vAkjIFFAggu2dWiZmt1/qz+jdv+zHdoBXSP1WrWb4JSNI4xWZund2lIkg1kYECQQDu+tZXK9GizNnlAD6w9uTxuX0hAmNJvcBqVuFIpuwKT1u4NcLKF81wPwaK1jZMm5g1XV7rWy8nr6CRhrZkNU4hAkEAmhdCGcM2gXjRdRwhoAjoF4sgpLBooi06WtvrIHnWuyS4QTjhTx4LvU5Xgx01zquKIpDwWCOC7O/7jqyyTGeXZQJANKbRKH1//3VQoHKQXV7YDCXI2sfy5iFHTmZ71gzovlDDrW8yzmG2In/QSjBt4Cz7uO4sZoA9gGniX42li6hu4QJAfVVRpJbN7L2S0QiSqRLVhODbKll6of7bqi+arg2sBQg2/oX/bVTpA4+HStQlgfaxIrB1bZtk0MfZ+xCo7dCMqQJAQ4Lcn5jFmJHo3QoXigK9pIjBF+mZpRtI/KeI1pTZFIE8DOTQXu+U0AP+OTkMuhWuXuDRg6PuOmPX0nGj9vT6+g== -----END RSA PRIVATE KEY-----

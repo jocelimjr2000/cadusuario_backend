@@ -1,4 +1,4 @@
-package up.positivo.user.models;
+package up.positivo.user.entities;
 
 import java.util.Date;
 
@@ -7,8 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
