@@ -67,13 +67,13 @@ public class UsuarioResource extends CustomErrors {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/atualizar")
 	@ApiOperation(value = "Atualizar Usuário")
 	public ResponseEntity<Usuario> update(@Valid @RequestBody UsuarioValidation usuarioValidation) {
 		try {
-			
-			
+
+
 			//Puxa o usuario do banco a partir do cpf validation
 			String cpf = usuarioValidation.getCpf();
 			Usuario usuario = usuarioRepository.findByCpf(cpf);
@@ -81,20 +81,20 @@ public class UsuarioResource extends CustomErrors {
 			if (usuario == null) {
 				return this.singleErrorException("error", "CPF não cadastrado");
 			}
-			
-			
+
+
 			//Pega nivel do usuario do banco
 			int nvCad = usuario.getNivel();
-			
-			
+
+
 			/*
 			 * 
 			 * NV LOGADO VIRA DO TOKEN
 			 * 
 			 */
 			int nvLogado = usuarioValidation.getNivelLogado();
-				
-			
+
+
 			if (nvLogado == (int) 1) {
 				return this.singleErrorException("error", "usuários do nível 1 não podem alterar outros usuários");
 			}
@@ -102,12 +102,12 @@ public class UsuarioResource extends CustomErrors {
 			if (nvLogado == 2 && nvCad > 1) {
 				return this.singleErrorException("error", "usuários do nível 2 só podem alterar usuários do nível 1");
 			}
-			
+
 			if (nvLogado == 2 && usuarioValidation.getNivel() > 2) {
 				return this.singleErrorException("error", "usuários do nivel 2 não podem alterar o nível de outros usuários para 3");
 			}
 
-			
+
 
 			usuario.setNome(usuarioValidation.getNome());
 			usuario.setEmail(usuarioValidation.getEmail());
@@ -122,7 +122,7 @@ public class UsuarioResource extends CustomErrors {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/listar/{status}")
 	@ApiOperation(value = "Listar todos os usuários por status")
 	public ResponseEntity<List<Usuario>> listStatus(@PathVariable("status") String status) {
@@ -147,11 +147,11 @@ public class UsuarioResource extends CustomErrors {
 		try {
 
 			Usuario usuario = usuarioRepository.findByCpf(cpf);
-			
+
 			if (usuario != null) {
 				return new ResponseEntity<>(usuario, HttpStatus.CREATED);
 			}
-			
+
 			return this.singleErrorException("error", "CPF não cadastrado");
 
 		} catch (Exception e) {
@@ -163,6 +163,36 @@ public class UsuarioResource extends CustomErrors {
 	@ApiOperation(value = "Aprovar usuário")
 	public ResponseEntity<Usuario> aprovar(@PathVariable("cpf") String cpf) {
 		try {
+
+			Usuario usuario = usuarioRepository.findByCpf(cpf);
+
+			if (usuario == null) {
+				return this.singleErrorException("error", "CPF não cadastrado");
+			}
+
+			String userStatus = usuario.isAprovado();
+
+			int nvCad = usuario.getNivel();
+
+			//Verifica o status do usuario
+			if (!userStatus.equalsIgnoreCase("P")) {
+				return this.singleErrorException("error", "Esse usuário não está mais pendente");
+			}
+
+
+			/*
+			 * VAI SER PEGO DO TOKEN
+			 */
+			int nvLogado = 3;
+
+			if (nvLogado < (int) 2) {
+				return this.singleErrorException("error", "usuários do nivel 1 não podem realizar operações de Aprovação");
+			}
+
+			if (nvLogado == 2 && nvCad > 1) {
+				return this.singleErrorException("error", "usuários do nivel 2 podem apenas aprovar usuários do nivel 1");
+			}
+
 
 			return new ResponseEntity<>(this.alterStatus(cpf, "A"), HttpStatus.CREATED);
 
@@ -176,13 +206,43 @@ public class UsuarioResource extends CustomErrors {
 	public ResponseEntity<Usuario> reprovar(@PathVariable("cpf") String cpf) {
 		try {
 
+			Usuario usuario = usuarioRepository.findByCpf(cpf);
+
+			if (usuario == null) {
+				return this.singleErrorException("error", "CPF não cadastrado");
+			}
+
+			String userStatus = usuario.isAprovado();
+
+			int nvCad = usuario.getNivel();
+
+			//Verifica o status do usuario
+			if (!userStatus.equalsIgnoreCase("P")) {
+				return this.singleErrorException("error", "Esse usuário não está mais pendente");
+			}
+
+
+			/*
+			 * VAI SER PEGO DO TOKEN
+			 */
+			int nvLogado = 1;
+
+			if (nvLogado < (int) 2) {
+				return this.singleErrorException("error", "usuários do nivel 1 não podem realizar operações de Reprovação");
+			}
+
+			if (nvLogado == 2 && nvCad > 1) {
+				return this.singleErrorException("error", "usuários do nivel 2 podem apenas Reprovar usuários do nivel 1");
+			}
+
+
 			return new ResponseEntity<>(this.alterStatus(cpf, "R"), HttpStatus.CREATED);
 
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	private Usuario alterStatus(String cpf, String status) {
 		Usuario usuario = usuarioRepository.findByCpf(cpf);
 
