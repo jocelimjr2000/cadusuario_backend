@@ -72,29 +72,47 @@ public class UsuarioResource extends CustomErrors {
 	@ApiOperation(value = "Atualizar Usuário")
 	public ResponseEntity<Usuario> update(@Valid @RequestBody UsuarioValidation usuarioValidation) {
 		try {
-
-			int nvLogado = usuarioValidation.getNivelLogado();
-			int nvCad = usuarioValidation.getNivel();
+			
+			
+			//Puxa o usuario do banco a partir do cpf validation
 			String cpf = usuarioValidation.getCpf();
-
-			if (nvLogado == (int) 1) {
-				return this.singleErrorException("error", "usuários do nível 1 não podem cadastrar outros usuários");
-			}
-
-			if (nvLogado == 2 && nvCad > 1) {
-				return this.singleErrorException("error", "usuários do nível 2 só podem cadastrar usuários do nível 1");
-			}
-
 			Usuario usuario = usuarioRepository.findByCpf(cpf);
 
 			if (usuario == null) {
 				return this.singleErrorException("error", "CPF não cadastrado");
 			}
+			
+			
+			//Pega nivel do usuario do banco
+			int nvCad = usuario.getNivel();
+			
+			
+			/*
+			 * 
+			 * NV LOGADO VIRA DO TOKEN
+			 * 
+			 */
+			int nvLogado = usuarioValidation.getNivelLogado();
+				
+			
+			if (nvLogado == (int) 1) {
+				return this.singleErrorException("error", "usuários do nível 1 não podem alterar outros usuários");
+			}
+
+			if (nvLogado == 2 && nvCad > 1) {
+				return this.singleErrorException("error", "usuários do nível 2 só podem alterar usuários do nível 1");
+			}
+			
+			if (nvLogado == 2 && usuarioValidation.getNivel() > 2) {
+				return this.singleErrorException("error", "usuários do nivel 2 não podem alterar o nível de outros usuários para 3");
+			}
+
+			
 
 			usuario.setNome(usuarioValidation.getNome());
 			usuario.setEmail(usuarioValidation.getEmail());
 			usuario.setDtNascimento(usuarioValidation.getDtNascimento());
-			usuario.setNivel(nvCad);
+			usuario.setNivel(usuarioValidation.getNivel());
 
 			usuario = usuarioRepository.save(usuario);
 
