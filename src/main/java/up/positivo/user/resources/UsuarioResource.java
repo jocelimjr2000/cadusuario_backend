@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import up.positivo.user.CustomErrors;
 import up.positivo.user.entities.Usuario;
 import up.positivo.user.repositories.UsuarioRepository;
+import up.positivo.user.requests.AlterStatusRequest;
 import up.positivo.user.requests.UsuarioRequest;
 
 @RestController
@@ -146,12 +147,15 @@ public class UsuarioResource extends CustomErrors {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-	@GetMapping("/aprovar/{cpf}")
-	@ApiOperation(value = "Aprovar usuário")
-	public ResponseEntity<Usuario> aprovar(@PathVariable("cpf") String cpf, @RequestAttribute("usuarioNivel") int nvLogado) {
+	
+	@PostMapping("/alterarstatus")
+	@ApiOperation(value = "Alterar Status")
+	public ResponseEntity<Usuario> alterarStatus(@Valid @RequestBody AlterStatusRequest alterStatusRequest, @RequestAttribute("usuarioNivel") int nvLogado) {
 		try {
-
+			
+			String cpf = alterStatusRequest.getCpf();
+			
+			//Puxa Usuario do Banco
 			Usuario usuario = usuarioRepository.findByCpf(cpf);
 
 			if (usuario == null) {
@@ -173,47 +177,17 @@ public class UsuarioResource extends CustomErrors {
 			}
 
 			if (nvLogado == 2 && nvCad > 1) {
-				return this.singleErrorException("error", "usuários do nivel 2 podem apenas aprovar usuários do nivel 1");
+				return this.singleErrorException("error", "usuários do nivel 2 podem apenas aprovar/reprovar usuários do nivel 1");
 			}
 
-			return new ResponseEntity<>(this.alterStatus(cpf, "A"), HttpStatus.OK);
-
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	@GetMapping("/reprovar/{cpf}")
-	@ApiOperation(value = "Reprovar usuário")
-	public ResponseEntity<Usuario> reprovar(@PathVariable("cpf") String cpf, @RequestAttribute("usuarioNivel") int nvLogado) {
-		try {
-
-			Usuario usuario = usuarioRepository.findByCpf(cpf);
-
-			if (usuario == null) {
-				return this.singleErrorException("error", "CPF não cadastrado");
+		
+			if (alterStatusRequest.isAprovar()) {
+				//Se a boolean é true, então é aprovado
+				return new ResponseEntity<>(this.alterStatus(cpf, "A"), HttpStatus.OK);
 			}
-
-			String userStatus = usuario.isAprovado();
-
-			int nvCad = usuario.getNivel();
-
-			// Verifica o status do usuario
-			if (!userStatus.equalsIgnoreCase("P")) {
-				return this.singleErrorException("error", "Esse usuário não está mais pendente");
-			}
-
-			if (nvLogado < (int) 2) {
-				return this.singleErrorException("error",
-						"usuários do nivel 1 não podem realizar operações de Reprovação");
-			}
-
-			if (nvLogado == 2 && nvCad > 1) {
-				return this.singleErrorException("error",
-						"usuários do nivel 2 podem apenas Reprovar usuários do nivel 1");
-			}
-
+			
 			return new ResponseEntity<>(this.alterStatus(cpf, "R"), HttpStatus.OK);
+			
 
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
