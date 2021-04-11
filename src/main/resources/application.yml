@@ -5,7 +5,7 @@ server:
 spring:
   datasource:
     username: sa
-    url: jdbc:h2:file:./data/exemplo
+    url: jdbc:h2:file:./data/database
     password: password
     driverClassName: org.h2.Driver
   jpa:
