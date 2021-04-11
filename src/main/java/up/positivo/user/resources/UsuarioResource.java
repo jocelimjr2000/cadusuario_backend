@@ -30,11 +30,11 @@ public class UsuarioResource extends CustomErrors {
 	
 	@PostMapping("/")
 	@ApiOperation(value = "Cadastrar Usuário")
-	public ResponseEntity<Usuario> create(@Valid @RequestBody UsuarioRequest usuarioValidation, @RequestAttribute("usuarioNivel") int nvLogado) {
+	public ResponseEntity<Usuario> create(@Valid @RequestBody UsuarioRequest usuarioRequest, @RequestAttribute("usuarioNivel") int nvLogado) {
 		try {
 			
-			int nvCad = usuarioValidation.getNivel();
-			String cpf = usuarioValidation.getCpf();
+			int nvCad = usuarioRequest.getNivel();
+			String cpf = usuarioRequest.getCpf();
 
 			if (nvLogado == (int) 1) {
 				return this.singleErrorException("error", "usuários do nível 1 não podem cadastrar outros usuários");
@@ -53,10 +53,10 @@ public class UsuarioResource extends CustomErrors {
 			Usuario usuario = new Usuario();
 
 			usuario.setCpf(cpf);
-			usuario.setNome(usuarioValidation.getNome());
-			usuario.setEmail(usuarioValidation.getEmail());
-			usuario.setSenha(usuarioValidation.getCpf());
-			usuario.setDtNascimento(usuarioValidation.getDtNascimento());
+			usuario.setNome(usuarioRequest.getNome());
+			usuario.setEmail(usuarioRequest.getEmail());
+			usuario.setSenha(usuarioRequest.getCpf());
+			usuario.setDtNascimento(usuarioRequest.getDtNascimento());
 			usuario.setNivel(nvCad);
 
 			usuario = usuarioRepository.save(usuario);
@@ -70,11 +70,11 @@ public class UsuarioResource extends CustomErrors {
 	
 	@PostMapping("/atualizar")
 	@ApiOperation(value = "Atualizar Usuário")
-	public ResponseEntity<Usuario> update(@Valid @RequestBody UsuarioRequest usuarioValidation, @RequestAttribute("usuarioNivel") int nvLogado) {
+	public ResponseEntity<Usuario> update(@Valid @RequestBody UsuarioRequest usuarioRequest, @RequestAttribute("usuarioNivel") int nvLogado) {
 		try {
 
 			// Puxa o usuario do banco a partir do cpf validation
-			String cpf = usuarioValidation.getCpf();
+			String cpf = usuarioRequest.getCpf();
 			Usuario usuario = usuarioRepository.findByCpf(cpf);
 
 			if (usuario == null) {
@@ -92,15 +92,15 @@ public class UsuarioResource extends CustomErrors {
 				return this.singleErrorException("error", "usuários do nível 2 só podem alterar usuários do nível 1");
 			}
 
-			if (nvLogado == 2 && usuarioValidation.getNivel() > 2) {
+			if (nvLogado == 2 && usuarioRequest.getNivel() > 2) {
 				return this.singleErrorException("error",
 						"usuários do nivel 2 não podem alterar o nível de outros usuários para 3");
 			}
 
-			usuario.setNome(usuarioValidation.getNome());
-			usuario.setEmail(usuarioValidation.getEmail());
-			usuario.setDtNascimento(usuarioValidation.getDtNascimento());
-			usuario.setNivel(usuarioValidation.getNivel());
+			usuario.setNome(usuarioRequest.getNome());
+			usuario.setEmail(usuarioRequest.getEmail());
+			usuario.setDtNascimento(usuarioRequest.getDtNascimento());
+			usuario.setNivel(usuarioRequest.getNivel());
 
 			usuario = usuarioRepository.save(usuario);
 
@@ -149,7 +149,7 @@ public class UsuarioResource extends CustomErrors {
 
 	@GetMapping("/aprovar/{cpf}")
 	@ApiOperation(value = "Aprovar usuário")
-	public ResponseEntity<Usuario> aprovar(@PathVariable("cpf") String cpf) {
+	public ResponseEntity<Usuario> aprovar(@PathVariable("cpf") String cpf, @RequestAttribute("usuarioNivel") int nvLogado) {
 		try {
 
 			Usuario usuario = usuarioRepository.findByCpf(cpf);
@@ -166,20 +166,14 @@ public class UsuarioResource extends CustomErrors {
 			if (!userStatus.equalsIgnoreCase("P")) {
 				return this.singleErrorException("error", "Esse usuário não está mais pendente");
 			}
-
-			/*
-			 * VAI SER PEGO DO TOKEN
-			 */
-			int nvLogado = 3;
+			
 
 			if (nvLogado < (int) 2) {
-				return this.singleErrorException("error",
-						"usuários do nivel 1 não podem realizar operações de Aprovação");
+				return this.singleErrorException("error", "usuários do nivel 1 não podem realizar operações de Aprovação");
 			}
 
 			if (nvLogado == 2 && nvCad > 1) {
-				return this.singleErrorException("error",
-						"usuários do nivel 2 podem apenas aprovar usuários do nivel 1");
+				return this.singleErrorException("error", "usuários do nivel 2 podem apenas aprovar usuários do nivel 1");
 			}
 
 			return new ResponseEntity<>(this.alterStatus(cpf, "A"), HttpStatus.OK);
@@ -191,7 +185,7 @@ public class UsuarioResource extends CustomErrors {
 
 	@GetMapping("/reprovar/{cpf}")
 	@ApiOperation(value = "Reprovar usuário")
-	public ResponseEntity<Usuario> reprovar(@PathVariable("cpf") String cpf) {
+	public ResponseEntity<Usuario> reprovar(@PathVariable("cpf") String cpf, @RequestAttribute("usuarioNivel") int nvLogado) {
 		try {
 
 			Usuario usuario = usuarioRepository.findByCpf(cpf);
@@ -208,11 +202,6 @@ public class UsuarioResource extends CustomErrors {
 			if (!userStatus.equalsIgnoreCase("P")) {
 				return this.singleErrorException("error", "Esse usuário não está mais pendente");
 			}
-
-			/*
-			 * VAI SER PEGO DO TOKEN
-			 */
-			int nvLogado = 1;
 
 			if (nvLogado < (int) 2) {
 				return this.singleErrorException("error",
