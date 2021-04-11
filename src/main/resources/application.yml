@@ -12,6 +12,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+        hbm2ddl:
+          import_files: classpath:data.sql
     show-sql: true
     hibernate:
       ddl-auto: update
