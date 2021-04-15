@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.Arrays;
+
 import up.positivo.user.entities.Usuario;
 import up.positivo.user.security.JwtTokenUtil;
 
@@ -20,7 +22,15 @@ public class Interceptor implements HandlerInterceptor {
 	@Value("${jwt.secret}")
 	private String secret;
 
-	private String publicEndPoint = "/login";
+	private String[] PUBLIC = {
+			// -- Swagger UI v2
+			"/v2/api-docs", 
+			"/configuration/ui",
+			"/configuration/security", 
+			"/login",
+			"/csrf",
+			"/error",
+	};
 
 	private String validationHeader = "Validation";
 
@@ -33,15 +43,22 @@ public class Interceptor implements HandlerInterceptor {
 
 		String requestApikey = request.getHeader("apikey");
 		String requestEndPoint = request.getRequestURI();
-
+		
+		boolean contains = Arrays.stream(PUBLIC).anyMatch(requestEndPoint::equals);
+		
+		if(
+				requestEndPoint.contains("/webjars") || 
+				requestEndPoint.contains("/swagger-resources") || 
+				requestEndPoint.contains("/swagger-ui.html") || 
+				contains) {
+			response.addHeader(validationHeader, "Ok");
+			return true;
+		}else {
+			System.out.println(">>>>>> Not Public " + requestEndPoint);
+		}
+		
 		// Check apikey
 		if (apikey.equals(requestApikey)) {
-
-			// Check public route
-			if (publicEndPoint.equals(requestEndPoint)) {
-				response.addHeader(validationHeader, "Ok");
-				return true;
-			}
 
 			// Get received token
 			String requestToken = request.getHeader("token");
