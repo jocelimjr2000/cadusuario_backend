@@ -30,6 +30,7 @@ public class Interceptor implements HandlerInterceptor {
 			"/login",
 			"/csrf",
 			"/error",
+			"/",
 	};
 
 	private String validationHeader = "Validation";
